@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Emergency Signal Synchronization</title>
+    <style>
+        :root {
+            --navy: #0F2A4A;
+            --teal: #188E99;
+            --cyan: #00BFFF;
+            --soft-green: #2E8B57;
+            --orange: #FF8C00;
+            --light-bg: #F4F7F6;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--light-bg); 
+            margin: 0; 
+            padding: 20px; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: var(--navy); 
+            border-bottom: 3px solid var(--teal); 
+            padding-bottom: 10px; 
+        }
+        .card { 
+            background: #f9fbfd; 
+            border-left: 5px solid var(--teal); 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+        }
+        .form-group { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 15px; 
+            flex-wrap: wrap; 
+        }
+        .form-group > div { 
+            flex: 1; 
+            min-width: 150px; 
+        }
+        label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            color: var(--navy); 
+            font-size: 14px; 
+        }
+        input, select { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            background-color: var(--teal); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            transition: 0.3s; 
+        }
+        button:hover { background-color: var(--navy); }
+        .btn-orange { background-color: var(--orange); }
+        .btn-orange:hover { background-color: #e07b00; }
+        .btn-gray { background-color: #6c757d; }
+        .btn-gray:hover { background-color: #5a6268; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px; 
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            text-align: center; 
+        }
+        th { 
+            background-color: var(--navy); 
+            color: white; 
+        }
+        .result-box { 
+            margin-top: 20px; 
+            padding: 20px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 18px; 
+        }
+        .success { 
+            background-color: #d4edda; 
+            color: var(--soft-green); 
+            border: 1px solid #c3e6cb; 
+        }
+        .error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Emergency Vehicle Priority (CRT-Based)</h1>
+    
+    <div class="card">
+        <h3>1. Simulation Settings</h3>
+        <div class="form-group">
+            <div>
+                <label>Vehicle Type</label>
+                <select id="vehicleType">
+                    <option value="Ambulance">Ambulance (High Priority)</option>
+                    <option value="Fire Engine">Fire Engine (Med Priority)</option>
+                    <option value="Police">Police (Std Priority)</option>
+                </select>
+            </div>
+            <div>
+                <label>Earliest Start Time (s)</label>
+                <input type="number" id="earliestStart" value="0" min="0">
+            </div>
+            <div>
+                <label>Search Horizon (s)</label>
+                <input type="number" id="searchHorizon" value="300" min="10">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>2. Intersection Configurations</h3>
+        <table id="intTable">
+            <thead>
+                <tr>
+                    <th>Cycle (s)</th>
+                    <th>Offset (s)</th>
+                    <th>Green Start (s)</th>
+                    <th>Green Duration (s)</th>
+                    <th>Travel Time (s)</th>
+                </tr>
+            </thead>
+            <tbody id="intBody">
+                <!-- Rows added dynamically via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <button onclick="calculatePriority()">Calculate Priority Departure</button>
+        <button onclick="loadExample()" class="btn-orange">Load Example</button>
+        <button onclick="resetData()" class="btn-gray">Reset</button>
+    </div>
+
+    <div id="resultArea" style="display: none;"></div>
+</div>
+
+<script>
+    // Initialize exactly 3 blank rows for the intersections
+    function initRows(num) {
+        let html = '';
+        for(let i=0; i<num; i++) {
+            html += `<tr>
+                <td><input type="number" class="cycle" value=""></td>
+                <td><input type="number" class="offset" value=""></td>
+                <td><input type="number" class="gstart" value=""></td>
+                <td><input type="number" class="gdur" value=""></td>
+                <td><input type="number" class="tt" value=""></td>
+            </tr>`;
+        }
+        document.getElementById('intBody').innerHTML = html;
+    }
+    
+    initRows(3);
+
+    // Load the mathematical demonstration values
+    function loadExample() {
+        const data = [
+            [60, 0, 0, 30, 15],
+            [45, 10, 5, 20, 45],
+            [90, 25, 20, 40, 80]
+        ];
+        document.getElementById('earliestStart').value = 0;
+        document.getElementById('searchHorizon').value = 300;
+        
+        let rows = document.getElementById('intBody').children;
+        for(let i=0; i<data.length; i++) {
+            let inputs = rows[i].getElementsByTagName('input');
+            inputs[0].value = data[i][0];
+            inputs[1].value = data[i][1];
+            inputs[2].value = data[i][2];
+            inputs[3].value = data[i][3];
+            inputs[4].value = data[i][4];
+        }
+    }
+
+    // Clear all fields and results
+    function resetData() {
+        initRows(3);
+        document.getElementById('earliestStart').value = 0;
+        document.getElementById('searchHorizon').value = 300;
+        document.getElementById('resultArea').style.display = 'none';
+    }
+
+    // Execute the algorithm and update the DOM
+    function calculatePriority() {
+        let start = parseInt(document.getElementById('earliestStart').value) || 0;
+        let horizon = parseInt(document.getElementById('searchHorizon').value) || 300;
+        let vehicle = document.getElementById('vehicleType').value;
+        
+        let intersections = [];
+        let rows = document.getElementById('intBody').children;
+        
+        for(let i=0; i<rows.length; i++) {
+            let inputs = rows[i].getElementsByTagName('input');
+            if(inputs[0].value && inputs[3].value) { // Ensure Cycle and Duration exist
+                intersections.push({
+                    c: parseInt(inputs[0].value),
+                    o: parseInt(inputs[1].value) || 0,
+                    gs: parseInt(inputs[2].value) || 0,
+                    gd: parseInt(inputs[3].value),
+                    tt: parseInt(inputs[4].value) || 0
+                });
+            }
+        }
+
+        if(intersections.length === 0) {
+            alert("Please enter data for at least one intersection or click 'Load Example'.");
+            return;
+        }
+
+        let feasible = -1;
+        
+        // Bounded search algorithm matching the C++ logic
+        for(let d = start; d <= start + horizon; d++) {
+            let passesAll = true;
+            for(let I of intersections) {
+                let A = d + I.tt;
+                let P = ((A - I.o) % I.c + I.c) % I.c; // Secure modulo
+                let g_end = I.gs + I.gd;
+                
+                let isGreen = false;
+                if(g_end <= I.c) {
+                    isGreen = (P >= I.gs && P < g_end);
+                } else {
+                    isGreen = (P >= I.gs || P < (g_end % I.c));
+                }
+                
+                if(!isGreen) { passesAll = false; break; }
+            }
+            if(passesAll) { feasible = d; break; }
+        }
+
+        // Render Results
+        let resDiv = document.getElementById('resultArea');
+        resDiv.style.display = 'block';
+        
+        if(feasible !== -1) {
+            let html = `<div class="result-box success">SUCCESS: Optimal Departure Time for ${vehicle} is ${feasible}s (Wait: ${feasible - start}s)</div>`;
+            html += `<h3>Intersection Breakdown</h3><table><tr><th>Intersection</th><th>Arrival Time</th><th>Signal Phase</th><th>Status</th></tr>`;
+            
+            intersections.forEach((I, idx) => {
+                let A = feasible + I.tt;
+                let P = ((A - I.o) % I.c + I.c) % I.c;
+                html += `<tr>
+                            <td>Int ${idx+1}</td>
+                            <td>${A}s</td>
+                            <td>Phase ${P}</td>
+                            <td style="color:var(--soft-green); font-weight:bold;">GREEN [Pass]</td>
+                         </tr>`;
+            });
+            html += `</table>`;
+            resDiv.innerHTML = html;
+        } else {
+            resDiv.innerHTML = `<div class="result-box error">FAILED: No feasible departure found within ${horizon}s horizon. Try adjusting the timings or expanding the search horizon.</div>`;
+        }
+    }
+</script>
+</body>
+</html>
