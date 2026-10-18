@@ -3,289 +3,641 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Emergency Signal Synchronization</title>
+    <title>Smart City Emergency Signal Synchronization (CRT)</title>
+    <!-- Modern Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy: #0F2A4A;
-            --teal: #188E99;
-            --cyan: #00BFFF;
-            --soft-green: #2E8B57;
-            --orange: #FF8C00;
-            --light-bg: #F4F7F6;
+            --navy-dark: #0A192F;
+            --navy-primary: #0F2A4A;
+            --teal-primary: #0284C7;
+            --teal-accent: #0EA5E9;
+            --mint-green: #10B981;
+            --amber-orange: #F59E0B;
+            --danger-red: #EF4444;
+            --bg-light: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --border-color: #E2E8F0;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
         }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--light-bg); 
-            margin: 0; 
-            padding: 20px; 
-            color: #333; 
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        .container { 
-            max-width: 1000px; 
-            margin: auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding: 30px 20px;
         }
-        h1 { 
-            color: var(--navy); 
-            border-bottom: 3px solid var(--teal); 
-            padding-bottom: 10px; 
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
         }
-        .card { 
-            background: #f9fbfd; 
-            border-left: 5px solid var(--teal); 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border-radius: 8px; 
+
+        /* College Header Banner */
+        .college-header {
+            background: linear-gradient(135deg, #0F2A4A 0%, #1E3A8A 100%);
+            color: white;
+            padding: 24px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(15, 42, 74, 0.2);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .form-group { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 15px; 
-            flex-wrap: wrap; 
+
+        .college-title h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #F8FAFC;
         }
-        .form-group > div { 
-            flex: 1; 
-            min-width: 150px; 
+
+        .college-title p {
+            font-size: 0.85rem;
+            color: #93C5FD;
+            font-weight: 500;
         }
-        label { 
-            display: block; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            color: var(--navy); 
-            font-size: 14px; 
+
+        .project-tag {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        input, select { 
-            width: 100%; 
-            padding: 8px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            box-sizing: border-box; 
+
+        /* Hero Card */
+        .hero-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 25px;
         }
-        button { 
-            background-color: var(--teal); 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            cursor: pointer; 
-            border-radius: 5px; 
-            font-weight: bold; 
-            transition: 0.3s; 
+
+        .hero-card h1 {
+            font-size: 1.85rem;
+            color: var(--navy-primary);
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
-        button:hover { background-color: var(--navy); }
-        .btn-orange { background-color: var(--orange); }
-        .btn-orange:hover { background-color: #e07b00; }
-        .btn-gray { background-color: #6c757d; }
-        .btn-gray:hover { background-color: #5a6268; }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 10px; 
+
+        .hero-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 800px;
         }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 10px; 
-            text-align: center; 
+
+        /* Vehicle Selector Grid */
+        .section-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--navy-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        th { 
-            background-color: var(--navy); 
-            color: white; 
+
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 25px;
         }
-        .result-box { 
-            margin-top: 20px; 
-            padding: 20px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            font-size: 18px; 
+
+        .vehicle-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .success { 
-            background-color: #d4edda; 
-            color: var(--soft-green); 
-            border: 1px solid #c3e6cb; 
+
+        .vehicle-card:hover {
+            border-color: var(--teal-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(2, 132, 199, 0.08);
         }
-        .error { 
-            background-color: #f8d7da; 
-            color: #721c24; 
-            border: 1px solid #f5c6cb; 
+
+        .vehicle-card.active {
+            border-color: var(--teal-primary);
+            background: #F0F9FF;
+            box-shadow: 0 0 0 1px var(--teal-primary);
+        }
+
+        .vehicle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vehicle-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .priority-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .pill-critical { background: #FEE2E2; color: #DC2626; }
+        .pill-high { background: #FEF3C7; color: #D97706; }
+        .pill-standard { background: #F1F5F9; color: #475569; }
+
+        .vehicle-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--navy-primary);
+        }
+
+        .vehicle-card span.desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Controls Panel */
+        .controls-row {
+            display: flex;
+            gap: 18px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--navy-primary);
+            background: white;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--teal-primary);
+        }
+
+        .btn-calculate {
+            flex: 1.5;
+            min-width: 240px;
+            background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+            color: white;
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.45);
+        }
+
+        /* Results Display Card */
+        .results-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 26px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .kpi-card p {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .kpi-card h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--navy-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-badge-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .status-success {
+            background: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        .status-failed {
+            background: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+
+        /* Route Corridor Timeline */
+        .timeline-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .route-track {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            padding: 20px 10px;
+            margin-bottom: 25px;
+        }
+
+        .route-track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            right: 20px;
+            height: 4px;
+            background: #E2E8F0;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .node-item {
+            position: relative;
+            z-index: 2;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 140px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .node-item.green-pass {
+            border-color: var(--mint-green);
+            background: #F0FDF4;
+        }
+
+        .node-icon {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .node-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy-primary);
+        }
+
+        .node-time {
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .node-badge {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        /* Results Table */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .custom-table th {
+            background: #F8FAFC;
+            color: var(--navy-primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .custom-table td {
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #F1F5F9;
+            color: var(--text-dark);
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .math-badge {
+            font-family: 'JetBrains Mono', monospace;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Emergency Vehicle Priority (CRT-Based)</h1>
-    
-    <div class="card">
-        <h3>1. Simulation Settings</h3>
-        <div class="form-group">
-            <div>
-                <label>Vehicle Type</label>
-                <select id="vehicleType">
-                    <option value="Ambulance">Ambulance (High Priority)</option>
-                    <option value="Fire Engine">Fire Engine (Med Priority)</option>
-                    <option value="Police">Police (Std Priority)</option>
-                </select>
+    <!-- College Header -->
+    <div class="college-header">
+        <div class="college-title">
+            <h2>Sanjivani College of Engineering, Kopargaon</h2>
+            <p>Discrete Mathematics Project (2026–2027) | Faculty: S. N. Gunjal</p>
+        </div>
+        <div class="project-tag">CRT Timing Model</div>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="hero-card">
+        <h1>Emergency Vehicle Priority Dispatcher</h1>
+        <p>Uses the Chinese Remainder Theorem (CRT) and modular arithmetic in C++ to compute ideal green corridor departure times across independent signalized intersections.</p>
+    </div>
+
+    <!-- Vehicle Selector Section -->
+    <div class="section-label">1. Choose Fleet Vehicle</div>
+    <div class="vehicle-grid">
+        <div class="vehicle-card active" onclick="selectVehicle('Ambulance', this)">
+            <div class="vehicle-header">
+                <span class="vehicle-icon">🚑</span>
+                <span class="priority-pill pill-critical">Priority 1</span>
             </div>
-            <div>
-                <label>Earliest Start Time (s)</label>
-                <input type="number" id="earliestStart" value="0" min="0">
+            <h3>Ambulance</h3>
+            <span class="desc">Medical emergency route. 300s horizon search.</span>
+        </div>
+
+        <div class="vehicle-card" onclick="selectVehicle('Fire_Brigade', this)">
+            <div class="vehicle-header">
+                <span class="vehicle-icon">🚒</span>
+                <span class="priority-pill pill-critical">Priority 1</span>
             </div>
-            <div>
-                <label>Search Horizon (s)</label>
-                <input type="number" id="searchHorizon" value="300" min="10">
+            <h3>Fire Brigade</h3>
+            <span class="desc">Critical rescue clearance. Maximum priority window.</span>
+        </div>
+
+        <div class="vehicle-card" onclick="selectVehicle('VIP_Convoy', this)">
+            <div class="vehicle-header">
+                <span class="vehicle-icon">🚓</span>
+                <span class="priority-pill pill-high">Priority 2</span>
             </div>
+            <h3>VIP Convoy</h3>
+            <span class="desc">High security motorcade. 150s search horizon.</span>
+        </div>
+
+        <div class="vehicle-card" onclick="selectVehicle('Normal_Car', this)">
+            <div class="vehicle-header">
+                <span class="vehicle-icon">🚗</span>
+                <span class="priority-pill pill-standard">Priority 3</span>
+            </div>
+            <h3>Standard Citizen</h3>
+            <span class="desc">Standard commuter profile. 60s baseline search.</span>
         </div>
     </div>
 
-    <div class="card">
-        <h3>2. Intersection Configurations</h3>
-        <table id="intTable">
+    <!-- Inputs & Trigger -->
+    <div class="section-label">2. Departure Parameters</div>
+    <div class="controls-row">
+        <div class="input-group">
+            <label for="startTime">Requested Earliest Departure (Seconds):</label>
+            <input type="number" id="startTime" value="0" min="0">
+        </div>
+        <button class="btn-calculate" onclick="triggerSolver()">
+            <span>⚡ Calculate Synchronized Corridor</span>
+        </button>
+    </div>
+
+    <!-- Results Panel -->
+    <div id="resultsCard" class="results-panel">
+        <div id="statusBanner" class="status-badge-container">
+            <!-- Dynamic Status Title -->
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <p>Recommended Departure</p>
+                <h2 id="kpiDeparture">--</h2>
+            </div>
+            <div class="kpi-card">
+                <p>Required Wait Delay</p>
+                <h2 id="kpiWait">--</h2>
+            </div>
+            <div class="kpi-card">
+                <p>Assigned Priority</p>
+                <h2 id="kpiPriority">--</h2>
+            </div>
+        </div>
+
+        <!-- Route Timeline Visualization -->
+        <div class="timeline-section-title">🚦 Corridor Synchronization Timeline</div>
+        <div class="route-track" id="routeTrack">
+            <!-- Nodes dynamically injected here -->
+        </div>
+
+        <!-- Detailed Intersection Table -->
+        <div class="timeline-section-title">📊 Intersection Phase Analytics</div>
+        <table class="custom-table">
             <thead>
                 <tr>
-                    <th>Cycle (s)</th>
-                    <th>Offset (s)</th>
-                    <th>Green Start (s)</th>
-                    <th>Green Duration (s)</th>
-                    <th>Travel Time (s)</th>
+                    <th>Intersection</th>
+                    <th>Cumulative Arrival</th>
+                    <th>Signal Phase</th>
+                    <th>Condition Validation</th>
                 </tr>
             </thead>
-            <tbody id="intBody">
-                <!-- Rows added dynamically via JS -->
+            <tbody id="tableBody">
+                <!-- Rows injected dynamically -->
             </tbody>
         </table>
     </div>
-
-    <div style="display: flex; gap: 10px;">
-        <button onclick="calculatePriority()">Calculate Priority Departure</button>
-        <button onclick="loadExample()" class="btn-orange">Load Example</button>
-        <button onclick="resetData()" class="btn-gray">Reset</button>
-    </div>
-
-    <div id="resultArea" style="display: none;"></div>
 </div>
 
 <script>
-    // Initialize exactly 3 blank rows for the intersections
-    function initRows(num) {
-        let html = '';
-        for(let i=0; i<num; i++) {
-            html += `<tr>
-                <td><input type="number" class="cycle" value=""></td>
-                <td><input type="number" class="offset" value=""></td>
-                <td><input type="number" class="gstart" value=""></td>
-                <td><input type="number" class="gdur" value=""></td>
-                <td><input type="number" class="tt" value=""></td>
-            </tr>`;
-        }
-        document.getElementById('intBody').innerHTML = html;
-    }
-    
-    initRows(3);
+    let currentVehicle = 'Ambulance';
 
-    // Load the mathematical demonstration values
-    function loadExample() {
-        const data = [
-            [60, 0, 0, 30, 15],
-            [45, 10, 5, 20, 45],
-            [90, 25, 20, 40, 80]
-        ];
-        document.getElementById('earliestStart').value = 0;
-        document.getElementById('searchHorizon').value = 300;
-        
-        let rows = document.getElementById('intBody').children;
-        for(let i=0; i<data.length; i++) {
-            let inputs = rows[i].getElementsByTagName('input');
-            inputs[0].value = data[i][0];
-            inputs[1].value = data[i][1];
-            inputs[2].value = data[i][2];
-            inputs[3].value = data[i][3];
-            inputs[4].value = data[i][4];
-        }
+    function selectVehicle(type, element) {
+        currentVehicle = type;
+        document.querySelectorAll('.vehicle-card').forEach(c => c.classList.remove('active'));
+        element.classList.add('active');
     }
 
-    // Clear all fields and results
-    function resetData() {
-        initRows(3);
-        document.getElementById('earliestStart').value = 0;
-        document.getElementById('searchHorizon').value = 300;
-        document.getElementById('resultArea').style.display = 'none';
-    }
-
-    // Execute the algorithm and update the DOM
-    function calculatePriority() {
-        let start = parseInt(document.getElementById('earliestStart').value) || 0;
-        let horizon = parseInt(document.getElementById('searchHorizon').value) || 300;
-        let vehicle = document.getElementById('vehicleType').value;
+    async function triggerSolver() {
+        const startTime = document.getElementById('startTime').value || 0;
+        const resultsCard = document.getElementById('resultsCard');
         
-        let intersections = [];
-        let rows = document.getElementById('intBody').children;
-        
-        for(let i=0; i<rows.length; i++) {
-            let inputs = rows[i].getElementsByTagName('input');
-            if(inputs[0].value && inputs[3].value) { // Ensure Cycle and Duration exist
-                intersections.push({
-                    c: parseInt(inputs[0].value),
-                    o: parseInt(inputs[1].value) || 0,
-                    gs: parseInt(inputs[2].value) || 0,
-                    gd: parseInt(inputs[3].value),
-                    tt: parseInt(inputs[4].value) || 0
-                });
-            }
-        }
+        resultsCard.style.display = 'block';
+        resultsCard.scrollIntoView({ behavior: 'smooth' });
 
-        if(intersections.length === 0) {
-            alert("Please enter data for at least one intersection or click 'Load Example'.");
-            return;
-        }
+        document.getElementById('statusBanner').innerHTML = 'Calculating via C++ solver...';
+        document.getElementById('statusBanner').className = 'status-badge-container';
 
-        let feasible = -1;
-        
-        // Bounded search algorithm matching the C++ logic
-        for(let d = start; d <= start + horizon; d++) {
-            let passesAll = true;
-            for(let I of intersections) {
-                let A = d + I.tt;
-                let P = ((A - I.o) % I.c + I.c) % I.c; // Secure modulo
-                let g_end = I.gs + I.gd;
-                
-                let isGreen = false;
-                if(g_end <= I.c) {
-                    isGreen = (P >= I.gs && P < g_end);
-                } else {
-                    isGreen = (P >= I.gs || P < (g_end % I.c));
-                }
-                
-                if(!isGreen) { passesAll = false; break; }
-            }
-            if(passesAll) { feasible = d; break; }
-        }
-
-        // Render Results
-        let resDiv = document.getElementById('resultArea');
-        resDiv.style.display = 'block';
-        
-        if(feasible !== -1) {
-            let html = `<div class="result-box success">SUCCESS: Optimal Departure Time for ${vehicle} is ${feasible}s (Wait: ${feasible - start}s)</div>`;
-            html += `<h3>Intersection Breakdown</h3><table><tr><th>Intersection</th><th>Arrival Time</th><th>Signal Phase</th><th>Status</th></tr>`;
-            
-            intersections.forEach((I, idx) => {
-                let A = feasible + I.tt;
-                let P = ((A - I.o) % I.c + I.c) % I.c;
-                html += `<tr>
-                            <td>Int ${idx+1}</td>
-                            <td>${A}s</td>
-                            <td>Phase ${P}</td>
-                            <td style="color:var(--soft-green); font-weight:bold;">GREEN [Pass]</td>
-                         </tr>`;
+        try {
+            const response = await fetch('/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vehicle: currentVehicle, startTime: parseInt(startTime) })
             });
-            html += `</table>`;
-            resDiv.innerHTML = html;
-        } else {
-            resDiv.innerHTML = `<div class="result-box error">FAILED: No feasible departure found within ${horizon}s horizon. Try adjusting the timings or expanding the search horizon.</div>`;
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.getElementById('statusBanner').className = 'status-badge-container status-success';
+                document.getElementById('statusBanner').innerHTML = `✅ Continuous Green Wave Established for ${data.vehicle.replace('_', ' ')}`;
+                
+                document.getElementById('kpiDeparture').innerText = `${data.departure}s`;
+                document.getElementById('kpiWait').innerText = `${data.wait_time}s`;
+                document.getElementById('kpiPriority').innerText = `Tier ${data.priority}`;
+
+                // Render Timeline Track
+                let timelineHTML = `
+                    <div class="node-item">
+                        <div class="node-icon">🏁</div>
+                        <div class="node-name">Departure</div>
+                        <div class="node-time">t = ${data.departure}s</div>
+                    </div>
+                `;
+
+                // Render Table & Timeline Nodes
+                let tableHTML = '';
+                data.intersections.forEach(i => {
+                    timelineHTML += `
+                        <div class="node-item green-pass">
+                            <div class="node-icon">🟢</div>
+                            <div class="node-name">Int. #${i.id}</div>
+                            <div class="node-time">Arrival: ${i.arrival}s</div>
+                            <span class="node-badge">GREEN</span>
+                        </div>
+                    `;
+
+                    tableHTML += `
+                        <tr>
+                            <td><strong>Intersection #${i.id}</strong></td>
+                            <td><span class="math-badge">${i.arrival}s</span></td>
+                            <td><span class="math-badge">Phase ${i.phase}</span></td>
+                            <td style="color: #059669; font-weight: 700;">✓ In Green Window</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('routeTrack').innerHTML = timelineHTML;
+                document.getElementById('tableBody').innerHTML = tableHTML;
+            } else {
+                document.getElementById('statusBanner').className = 'status-badge-container status-failed';
+                document.getElementById('statusBanner').innerHTML = `❌ ${data.message} (Horizon searched: ${data.horizon}s)`;
+                document.getElementById('kpiDeparture').innerText = 'N/A';
+                document.getElementById('kpiWait').innerText = 'N/A';
+                document.getElementById('kpiPriority').innerText = `Tier ${data.priority}`;
+                document.getElementById('routeTrack').innerHTML = '<p style="color:#64748B; padding:10px;">No corridor trajectory available.</p>';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94A3B8;">No data</td></tr>';
+            }
+        } catch (err) {
+            document.getElementById('statusBanner').className = 'status-badge-container status-failed';
+            document.getElementById('statusBanner').innerHTML = `❌ Error connecting to backend: ${err.message}`;
         }
     }
 </script>
+
 </body>
 </html>
