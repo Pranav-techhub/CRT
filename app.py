@@ -14,7 +14,6 @@ def calculate():
     vehicle = data.get('vehicle', 'Ambulance')
     start_time = str(data.get('startTime', 0))
     
-    # Run the compiled C++ backend and capture its output
     try:
         result = subprocess.run(['./solver', vehicle, start_time], capture_output=True, text=True)
         output = json.loads(result.stdout)
@@ -23,5 +22,4 @@ def calculate():
         return jsonify({"error": "Failed to run C++ backend.", "details": str(e)})
 
 if __name__ == '__main__':
-    # Runs on port 8080 for GitHub Codespaces
     app.run(host='0.0.0.0', port=8080)
