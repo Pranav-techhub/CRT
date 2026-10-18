@@ -9,7 +9,7 @@ struct Intersection {
 };
 
 int main(int argc, char* argv[]) {
-    // Check if arguments are passed
+    // Check if arguments are passed from the Python server
     if(argc < 3) {
         cout << "{\"error\": \"Missing arguments\"}\n";
         return 1;
@@ -17,15 +17,9 @@ int main(int argc, char* argv[]) {
 
     string vehicle = argv[1];
     int start_time = stoi(argv[2]);
-    int priority = 3; // Default low priority
-
-    // Auto-assign priority based on vehicle type
-    if (vehicle == "Ambulance" || vehicle == "Fire_Brigade") priority = 1;
-    else if (vehicle == "VIP_Convoy") priority = 2;
-
-    // The search horizon changes based on priority. 
-    // Higher priority vehicles search longer to find a guaranteed green corridor.
-    int search_horizon = (priority == 1) ? 300 : ((priority == 2) ? 150 : 60);
+    
+    // Fixed search horizon for CRT demonstration (search up to 5 minutes)
+    int search_horizon = 300; 
 
     // Hardcoded intersections for demonstration
     vector<Intersection> route = {
@@ -54,7 +48,7 @@ int main(int argc, char* argv[]) {
             }
         }
         if (passes_all) {
-            feasible_departure = d;
+            feasible_departure = d; // Optimal time found
             break;
         }
     }
@@ -62,7 +56,6 @@ int main(int argc, char* argv[]) {
     // Output JSON for the web server to read
     cout << "{";
     cout << "\"vehicle\": \"" << vehicle << "\", ";
-    cout << "\"priority\": " << priority << ", ";
     
     if (feasible_departure != -1) {
         cout << "\"status\": \"success\", ";
@@ -79,7 +72,7 @@ int main(int argc, char* argv[]) {
         cout << "]";
     } else {
         cout << "\"status\": \"failed\", ";
-        cout << "\"message\": \"No feasible corridor found within horizon limit.\", ";
+        cout << "\"message\": \"No feasible mathematical corridor found within search limit.\", ";
         cout << "\"horizon\": " << search_horizon;
     }
     cout << "}\n";
