@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GreenWave | CRT Traffic Synchronization</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <nav class="nav">
+        <a class="brand" href="#">
+            <b>↗</b> GreenWave<span>.</span>
+        </a>
+
+        <div class="nav-right">
+            <i></i> CRT SIMULATOR
+            <a href="#how">How it works</a>
+        </div>
+    </nav>
+
+    <main class="wrap">
+
+        <section class="hero">
+            <div class="hero-content">
+                <label class="eyebrow">
+                    SMARTER ROUTES · SAFER ARRIVALS
+                </label>
+
+                <h1>
+                    Make every<br>
+                    <em>second count.</em>
+                </h1>
+
+                <p>
+                    Explore how the Chinese Remainder Theorem can
+                    synchronize traffic-light phases for emergency
+                    journeys—one intersection at a time.
+                </p>
+
+                <div class="pills">
+                    <span>✦ CRT-based logic</span>
+                    <span>⌁ Route simulation</span>
+                    <span>◷ Green-window checks</span>
+                </div>
+            </div>
+
+            <div class="art">
+                <div class="road road-horizontal"></div>
+                <div class="road road-vertical"></div>
+                <div class="dash"></div>
+
+                <div class="pin pin-a">A</div>
+                <div class="pin pin-b">B</div>
+
+                <div class="light">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                </div>
+
+                <div class="van">✚</div>
+
+                <div class="artlabel">
+                    <b>GREEN WAVE</b>
+                    <small>Conceptual simulation</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="heading">
+                <div>
+                    <small>01 / CONFIGURE</small>
+                    <h2>Plan your emergency route</h2>
+                    <p>
+                        Choose a vehicle, departure time, and signal
+                        timing for each intersection.
+                    </p>
+                </div>
+
+                <div class="flow">
+                    INPUTS <b>→</b> CRT <b>→</b> RESULTS
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="fields">
+                    <label>
+                        VEHICLE TYPE
+
+                        <select id="vehicle">
+                            <option>Ambulance</option>
+                            <option>Fire Brigade</option>
+                            <option>Police / Rescue</option>
+                            <option>VIP Convoy</option>
+                            <option>Other Emergency Vehicle</option>
+                            <option>Regular Car (demo)</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        DEPARTURE TIME
+
+                        <input id="departure"
+                               type="time"
+                               value="08:00">
+                    </label>
+
+                    <div class="priority">
+                        <b>✦</b>
+
+                        <div>
+                            <strong id="priorityTitle">
+                                Emergency priority
+                            </strong>
+
+                            <small id="priorityText">
+                                Simulation only · no live signal control
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inthead">
+                    <div>
+                        <h3>Route intersections</h3>
+                        <p>Timing values are in seconds.</p>
+                    </div>
+
+                    <button class="lightbtn" id="add" type="button">
+                        ＋ Add signal
+                    </button>
+                </div>
+
+                <div id="signals"></div>
+
+                <div class="actions">
+                    <button class="primary" id="run" type="button">
+                        Run synchronization <b>↗</b>
+                    </button>
+
+                    <button class="quiet" id="reset" type="button">
+                        Reset example
+                    </button>
+
+                    <span>Demo data is editable</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="results" class="section hide">
+            <div class="heading">
+                <div>
+                    <small>02 / SIMULATION</small>
+                    <h2>Your synchronization report</h2>
+                    <p>
+                        Calculated by the C++ solver and displayed here.
+                    </p>
+                </div>
+
+                <b class="computed">● COMPUTED</b>
+            </div>
+
+            <div id="summary" class="summary"></div>
+
+            <div class="resultgrid">
+                <div class="panel">
+                    <small>ARRIVAL ANALYSIS</small>
+                    <h3>Signal-by-signal status</h3>
+                    <div id="signalResults"></div>
+                </div>
+
+                <div class="panel">
+                    <small>CRT SOLUTION</small>
+                    <h3>Combine the congruences</h3>
+
+                    <div class="formula">
+                        <small>TARGET-PHASE CONGRUENCES</small>
+                        <div id="equations"></div>
+                    </div>
+
+                    <div id="crt"></div>
+
+                    <p class="note">
+                        CRT targets one point within each green interval.
+                        It is a mathematical candidate, not a guarantee
+                        of safe passage or a command to real traffic
+                        infrastructure.
+                    </p>
+                </div>
+            </div>
+
+            <div class="panel timeline">
+                <small>ROUTE OVERVIEW</small>
+                <h3>Arrival timeline</h3>
+                <div id="timeline"></div>
+            </div>
+        </section>
+
+        <section id="how" class="section">
+            <div class="heading">
+                <div>
+                    <small>03 / THE IDEA</small>
+                    <h2>From modular arithmetic to a green wave</h2>
+                    <p>
+                        A simple demonstration of the mathematics behind
+                        coordinated signal timing.
+                    </p>
+                </div>
+            </div>
+
+            <div class="steps">
+                <article>
+                    <b>01</b>
+                    <h3>Model each signal</h3>
+                    <p>
+                        Cycle length, offset, green-start phase, green
+                        duration, and travel time describe each
+                        intersection.
+                    </p>
+                </article>
+
+                <article>
+                    <b>02</b>
+                    <h3>Build congruences</h3>
+                    <p>
+                        Each signal creates a modular condition for
+                        departure time to reach a selected target phase.
+                    </p>
+                </article>
+
+                <article>
+                    <b>03</b>
+                    <h3>Combine with CRT</h3>
+                    <p>
+                        The C++ solver combines compatible conditions,
+                        even when cycle lengths share factors.
+                    </p>
+                </article>
+
+                <article>
+                    <b>04</b>
+                    <h3>Validate the route</h3>
+                    <p>
+                        The chosen departure time is separately checked
+                        against each configured green window.
+                    </p>
+                </article>
+            </div>
+
+            <div class="warning">
+                <b>!</b>
+
+                <div>
+                    <strong>Academic prototype only</strong>
+
+                    <p>
+                        This site does not connect to traffic controllers,
+                        GPS, live traffic, or emergency dispatch. Real
+                        deployment requires authorized infrastructure,
+                        live data, safety engineering, and emergency-service
+                        approval. Never use this simulation for an actual
+                        emergency.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <a class="brand" href="#">
+                <b>↗</b> GreenWave<span>.</span>
+            </a>
+
+            <span>Discrete Mathematics · CRT</span>
+            <span>HTML · CSS · JavaScript · Python · C++</span>
+        </footer>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
