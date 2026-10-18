@@ -17,7 +17,9 @@ def compile_solver():
         compiler = shutil.which("g++")
 
         if not compiler:
-            raise RuntimeError("C++ compiler g++ not found.")
+            raise RuntimeError(
+                "g++ not found. Use the included Codespaces environment."
+            )
 
         result = subprocess.run(
             [compiler, "-std=c++17", "-O2", CPP, "-o", BIN],
@@ -39,21 +41,59 @@ def solve():
     try:
         data = request.get_json(force=True)
 
-        hour, minute = map(int, data["departure"].split(":"))
-        departure = hour * 3600 + minute * 60
+        departure = data["departure"]
+        hour, minute = map(int, departure.split(":"))
 
-        intersections = data["intersections"]
+        if not (0 <= hour < 24 and 0 <= minute < 60):
+            raise ValueError("Enter a valid departure time.")
+
+        items = data.get("intersections", [])
+
+        if not items:
+            raise ValueError("Add at least one intersection.")
+
+        vehicle = str(data.get("vehicle", "Ambulance"))
+        vehicle = vehicle.replace(" ", "_")
 
         lines = [
-            f'{data["vehicle"].replace(" ", "_")} '
-            f'{departure} {len(intersections)}'
+            f"{vehicle} {hour * 3600 + minute * 60} {len(items)}"
         ]
 
-        for s in intersections:
+        for i, item in enumerate(items, 1):
+            cycle = int(item["cycle"])
+            offset = int(item["offset"])
+            green_start = int(item["greenStart"])
+            green_duration = int(item["greenDuration"])
+            travel = int(item["travel"])
+
+            if cycle < 2:
+                raise ValueError(
+                    f"Intersection {i}: cycle must be at least 2."
+                )
+
+            if not 0 <= offset < cycle:
+                raise ValueError(
+                    f"Intersection {i}: offset must be 0 to cycle - 1."
+                )
+
+            if not 0 <= green_start < cycle:
+                raise ValueError(
+                    f"Intersection {i}: green start must be 0 to cycle - 1."
+                )
+
+            if not 1 <= green_duration <= cycle:
+                raise ValueError(
+                    f"Intersection {i}: green duration must be 1 to cycle."
+                )
+
+            if travel < 0:
+                raise ValueError(
+                    f"Intersection {i}: travel time cannot be negative."
+                )
+
             lines.append(
-                f'{s["cycle"]} {s["offset"]} '
-                f'{s["greenStart"]} {s["greenDuration"]} '
-                f'{s["travel"]}'
+                f"{cycle} {offset} {green_start} "
+                f"{green_duration} {travel}"
             )
 
         compile_solver()
@@ -67,13 +107,25 @@ def solve():
         )
 
         if result.returncode != 0:
-            raise RuntimeError(result.stderr)
+            raise RuntimeError(
+                result.stderr or "The C++ solver failed."
+            )
 
-        return jsonify(json.loads(result.stdout))
+        output = json.loads(result.stdout)
+        output["vehicle"] = data.get("vehicle", "Ambulance")
+
+        return jsonify(output)
+
+    except ValueError as error:
+        return jsonify(error=str(error) or "Invalid input."), 400
 
     except Exception as error:
-        return jsonify({"error": str(error)}), 400
+        return jsonify(error=str(error)), 500
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
