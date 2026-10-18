@@ -1,204 +1,245 @@
 
 #include <iostream>
 #include <string>
-#include <cstdio>
 using namespace std;
 
-int main() {
+int gcdSimple(int a, int b)
+{
+    while (b != 0)
+    {
+        int r = a % b;
+        a = b;
+        b = r;
+    }
+    return a;
+}
+
+int positiveMod(int value, int mod)
+{
+    value = value % mod;
+
+    if (value < 0)
+        value = value + mod;
+
+    return value;
+}
+
+void printTime(int seconds)
+{
+    seconds = positiveMod(seconds, 86400);
+
+    int hour = seconds / 3600;
+    int minute = (seconds % 3600) / 60;
+
+    if (hour < 10) cout << "0";
+    cout << hour << ":";
+
+    if (minute < 10) cout << "0";
+    cout << minute;
+}
+
+int main()
+{
     string vehicle;
     int departure, n;
 
     cin >> vehicle >> departure >> n;
 
-    int cycle[8], offset[8], greenStart[8];
-    int greenDuration[8], travel[8];
-
-    int arrival[8], phase[8];
-    bool green[8];
-
-    int i, j;
-
-    // Read signal information
-    for (i = 0; i < n; i++) {
-        cin >> cycle[i] >> offset[i] >> greenStart[i]
-            >> greenDuration[i] >> travel[i];
+    if (n < 1 || n > 20)
+    {
+        cout << "{}";
+        return 0;
     }
 
-    int totalTravel = 0;
-    bool allGreen = true;
+    int cycle[20], offset[20];
+    int greenStart[20], greenDuration[20];
+    int travel[20], target[20], remainder[20];
+    int arrival[20], phase[20];
+    bool green[20];
 
-    // Calculate arrival time and signal status
-    for (i = 0; i < n; i++) {
-        totalTravel = totalTravel + travel[i];
-
-        arrival[i] = departure + totalTravel;
-
-        phase[i] = (arrival[i] - offset[i]) % cycle[i];
-
-        if (phase[i] < 0) {
-            phase[i] = phase[i] + cycle[i];
-        }
-
-        int difference = phase[i] - greenStart[i];
-
-        if (difference < 0) {
-            difference = difference + cycle[i];
-        }
-
-        if (difference < greenDuration[i]) {
-            green[i] = true;
-        } else {
-            green[i] = false;
-            allGreen = false;
-        }
-    }
-
-    // Find the target phase for each signal
-    int target[8];
-    int remainder[8];
-
-    for (i = 0; i < n; i++) {
-        target[i] = greenStart[i] + (greenDuration[i] - 1) / 2;
-
-        if (target[i] >= cycle[i]) {
-            target[i] = target[i] % cycle[i];
-        }
-
-        remainder[i] = (offset[i] + target[i] - 0) % cycle[i];
-
-        remainder[i] = (remainder[i] - (totalTravel - travel[i])) % cycle[i];
-
-        if (remainder[i] < 0) {
-            remainder[i] = remainder[i] + cycle[i];
-        }
-
-        // Include travel to the current signal
-        remainder[i] = (remainder[i] - travel[i]) % cycle[i];
-
-        if (remainder[i] < 0) {
-            remainder[i] = remainder[i] + cycle[i];
-        }
-    }
-
-    // Calculate the least common multiple of cycle lengths
     int commonPeriod = 1;
 
-    for (i = 0; i < n; i++) {
-        int number = commonPeriod;
-        int other = cycle[i];
+    for (int i = 0; i < n; i++)
+    {
+        cin >> cycle[i] >> offset[i]
+            >> greenStart[i] >> greenDuration[i]
+            >> travel[i];
 
-        while (other != 0) {
-            int temp = other;
-            other = number % other;
-            number = temp;
+        if (cycle[i] <= 0 || greenDuration[i] <= 0 ||
+            greenDuration[i] > cycle[i] || travel[i] < 0)
+        {
+            cout << "{}";
+            return 0;
         }
 
-        int gcd = number;
-        commonPeriod = (commonPeriod / gcd) * cycle[i];
+        int g = gcdSimple(commonPeriod, cycle[i]);
+
+        commonPeriod = (commonPeriod / g) * cycle[i];
     }
 
-    // Search for a departure time that matches every target phase
-    int answer = -1;
+    // Calculate the target phase for each signal.
+    int totalTravel = 0;
 
-    for (int time = 0; time < commonPeriod; time++) {
-        bool match = true;
+    for (int i = 0; i < n; i++)
+    {
+        target[i] = positiveMod(
+            greenStart[i] + (greenDuration[i] - 1) / 2,
+            cycle[i]);
 
-        for (i = 0; i < n; i++) {
-            int signalArrival = time;
+        remainder[i] = positiveMod(
+            offset[i] + target[i] - totalTravel,
+            cycle[i]);
 
-            for (j = 0; j <= i; j++) {
-                signalArrival = signalArrival + travel[j];
-            }
+        totalTravel = totalTravel + travel[i];
+    }
 
-            int signalPhase = (signalArrival - offset[i]) % cycle[i];
+    // Start with the first congruence.
+    int result = remainder[0];
+    int currentModulus = cycle[0];
+    bool possible = true;
 
-            if (signalPhase < 0) {
-                signalPhase = signalPhase + cycle[i];
-            }
+    // Combine the remaining congruences using CRT.
+    for (int i = 1; i < n; i++)
+    {
+        int g = gcdSimple(currentModulus, cycle[i]);
 
-            if (signalPhase != target[i]) {
-                match = false;
-                break;
-            }
-        }
-
-        if (match) {
-            answer = time;
+        // Check whether the equations are compatible.
+        if (positiveMod(result - remainder[i], g) != 0)
+        {
+            possible = false;
             break;
         }
-    }
 
-    // Print results in JSON format for the website
-    int hour = (departure / 3600) % 24;
-    int minute = (departure % 3600) / 60;
+        int newModulus = (currentModulus / g) * cycle[i];
+        int candidate = result;
+        bool found = false;
 
-    char departureText[10];
-    snprintf(departureText, sizeof(departureText),
-             "%02d:%02d", hour, minute);
+        // Find a value satisfying both equations.
+        while (candidate < newModulus)
+        {
+            if (positiveMod(candidate - remainder[i],
+                            cycle[i]) == 0)
+            {
+                found = true;
+                break;
+            }
 
-    cout << "{\"departure\":\"" << departureText << "\",";
-    cout << "\"allGreen\":" << (allGreen ? "true" : "false") << ",";
-    cout << "\"routeStatus\":\"";
-
-    if (allGreen) {
-        cout << "All configured signals are green at simulated arrival times.";
-    } else {
-        cout << "One or more signals are outside their configured green windows.";
-    }
-
-    cout << "\",\"congruences\":\"";
-
-    for (i = 0; i < n; i++) {
-        if (i > 0) {
-            cout << "; ";
+            candidate = candidate + currentModulus;
         }
+
+        if (!found)
+        {
+            possible = false;
+            break;
+        }
+
+        result = candidate;
+        currentModulus = newModulus;
+    }
+
+    // Check the entered departure time at every intersection.
+    totalTravel = 0;
+    bool allGreen = true;
+
+    for (int i = 0; i < n; i++)
+    {
+        arrival[i] = departure + totalTravel;
+
+        phase[i] = positiveMod(
+            arrival[i] - offset[i], cycle[i]);
+
+        int difference = positiveMod(
+            phase[i] - greenStart[i], cycle[i]);
+
+        green[i] = (difference < greenDuration[i]);
+
+        if (!green[i])
+            allGreen = false;
+
+        totalTravel = totalTravel + travel[i];
+    }
+
+    // Display results in JSON format for the website.
+    cout << "{";
+
+    cout << "\"departure\":\"";
+    printTime(departure);
+    cout << "\",";
+
+    cout << "\"allGreen\":"
+         << (allGreen ? "true" : "false") << ",";
+
+    cout << "\"routeStatus\":\""
+         << (allGreen ? "All signals green"
+                      : "Some signals are not green")
+         << "\",";
+
+    cout << "\"congruences\":\"";
+
+    for (int i = 0; i < n; i++)
+    {
+        if (i > 0) cout << "; ";
 
         cout << "T ≡ " << remainder[i]
              << " (mod " << cycle[i] << ")";
     }
 
-    cout << "\",\"crtPossible\":" << (answer != -1 ? "true" : "false");
+    cout << "\",";
 
-    if (answer != -1) {
-        int answerHour = (answer / 3600) % 24;
-        int answerMinute = (answer % 3600) / 60;
+    cout << "\"crtPossible\":"
+         << (possible ? "true" : "false") << ",";
 
-        char answerText[10];
-        snprintf(answerText, sizeof(answerText),
-                 "%02d:%02d", answerHour, answerMinute);
+    cout << "\"crtResidue\":";
 
-        cout << ",\"crtResidue\":" << answer;
-        cout << ",\"crtModulus\":" << commonPeriod;
-        cout << ",\"crtTime\":\"" << answerText << "\"";
-        cout << ",\"crtExplanation\":\"A matching departure time was found by checking possible times one by one.\"";
-    } else {
-        cout << ",\"crtResidue\":null";
-        cout << ",\"crtModulus\":" << commonPeriod;
-        cout << ",\"crtTime\":null";
-        cout << ",\"crtExplanation\":\"No matching target departure time was found in one complete common period.\"";
+    if (possible)
+        cout << result;
+    else
+        cout << "null";
+
+    cout << ",\"crtModulus\":"
+         << (possible ? currentModulus : commonPeriod) << ",";
+
+    cout << "\"crtTime\":\"";
+
+    if (possible)
+        printTime(result);
+    else
+        cout << "Not found";
+
+    cout << "\",";
+
+    cout << "\"crtExplanation\":\"";
+
+    if (possible)
+    {
+        cout << "CRT solution: T ≡ " << result
+             << " (mod " << currentModulus
+             << "). The target signal phases repeat after the combined period.";
+    }
+    else
+    {
+        cout << "No common solution exists because the congruences are incompatible.";
     }
 
-    cout << ",\"signals\":[";
+    cout << "\",";
 
-    for (i = 0; i < n; i++) {
-        if (i > 0) {
-            cout << ",";
-        }
+    cout << "\"signals\":[";
 
-        int arrivalHour = (arrival[i] / 3600) % 24;
-        int arrivalMinute = (arrival[i] % 3600) / 60;
+    for (int i = 0; i < n; i++)
+    {
+        if (i > 0) cout << ",";
 
-        char arrivalText[10];
-        snprintf(arrivalText, sizeof(arrivalText),
-                 "%02d:%02d", arrivalHour, arrivalMinute);
-
-        cout << "{\"name\":\"Intersection " << i + 1 << "\",";
-        cout << "\"arrival\":\"" << arrivalText << "\",";
+        cout << "{";
+        cout << "\"name\":\"Intersection " << i + 1 << "\",";
+        cout << "\"arrival\":\"";
+        printTime(arrival[i]);
+        cout << "\",";
         cout << "\"phase\":" << phase[i] << ",";
         cout << "\"cycle\":" << cycle[i] << ",";
         cout << "\"green\":" << (green[i] ? "true" : "false") << ",";
         cout << "\"status\":\""
-             << (green[i] ? "Green window" : "Outside green window")
+             << (green[i] ? "Green window"
+                          : "Outside green window")
              << "\"}";
     }
 
